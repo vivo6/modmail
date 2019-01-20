@@ -103,10 +103,10 @@ class Thread:
             return
 
         if self.bot.selfhosted:
-            log_url = f'{self.bot.config.log_url}/logs/{log_data["_id"]}'
+            log_url = f'{self.bot.config.log_url}/logs/{log_data["key"]}'
         else:
             log_url = f"https://logs.modmail.tk/" \
-                      f"{log_data['_id']}"
+                      f"{log_data['key']}"
 
         user = self.recipient.mention if self.recipient else f'`{self.id}`'
 
@@ -116,7 +116,7 @@ class Thread:
         else:
             sneak_peak = 'No content'
 
-        desc = f"{user} [`{log_data['_id']}`]({log_url}): {sneak_peak}"
+        desc = f"{user} [`{log_data['key']}`]({log_url}): {sneak_peak}"
 
         em = discord.Embed(description=desc, color=discord.Color.red())
 
@@ -377,7 +377,7 @@ class ThreadManager:
                 if message.embeds:
                     em = message.embeds[0]
                     # TODO: use re.search instead
-                    matches = re.findall(r'User ID: (\d+)', em.footer.text)
+                    matches = re.findall(r'User ID: (\d+)', str(em.footer.text))
                     if matches:
                         user_id = int(matches[0])
                         break
@@ -395,7 +395,7 @@ class ThreadManager:
 
             return thread
 
-    async def create(self, recipient, *, creator=None):
+    async def create(self, recipient, *, creator=None, category=None):
         """Creates a modmail thread"""
 
         em = discord.Embed(
@@ -414,7 +414,7 @@ class ThreadManager:
 
         channel = await self.bot.modmail_guild.create_text_channel(
             name=self._format_channel_name(recipient),
-            category=self.bot.main_category
+            category=category or self.bot.main_category
         )
 
         thread.channel = channel
