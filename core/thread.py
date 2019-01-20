@@ -103,10 +103,9 @@ class Thread:
             return
 
         if self.bot.selfhosted:
-            log_url = f'{self.bot.config.log_url}/logs/{log_data["key"]}'
+            log_url = f"{self.bot.config.log_url.strip('/')}/logs/{log_data['key']}"
         else:
-            log_url = f"https://logs.modmail.tk/" \
-                      f"{log_data['key']}"
+            log_url = f"https://logs.modmail.tk/{log_data['key']}"
 
         user = self.recipient.mention if self.recipient else f'`{self.id}`'
 
@@ -412,9 +411,21 @@ class ThreadManager:
 
         self.cache[recipient.id] = thread = Thread(self, recipient)
 
+        overwrites = { 
+            self.bot.modmail_guild.default_role: discord.PermissionOverwrite(read_messages=False) 
+            }
+        # in case it creates a channel outside of category
+
+        category = category or self.bot.main_category
+
+        if category is not None:
+            overwrites = None 
+
         channel = await self.bot.modmail_guild.create_text_channel(
             name=self._format_channel_name(recipient),
-            category=category or self.bot.main_category
+            category=category,
+            overwrites=overwrites,
+            reason='Creating a thread channel'
         )
 
         thread.channel = channel
