@@ -323,7 +323,7 @@ class Modmail:
         if not any(not e['open'] for e in logs):
             return await ctx.send(embed=discord.Embed(color=discord.Color.red(), description='This user does not have any previous logs'))
 
-        em = discord.Embed(color=discord.Color.green())
+        em = discord.Embed(color=discord.Color.blurple())
         em.set_author(name=f'{username} - Previous Logs', icon_url=icon_url)
 
         embeds = [em]
@@ -345,7 +345,7 @@ class Modmail:
             new_day = date.strftime(r'%d %b %Y')
             time = date.strftime(r'%H:%M')
 
-            key = entry['_id']
+            key = entry['key']
             closer = entry['closer']['name']
             log_url = f"https://logs.modmail.tk/{key}" if not self.bot.selfhosted else self.bot.config.log_url.strip('/') + f'/logs/{key}'
 
@@ -377,6 +377,15 @@ class Modmail:
         thread = await self.bot.threads.find(channel=ctx.channel)
         if thread:
             await thread.reply(ctx.message)
+    
+    @commands.command()
+    @trigger_typing
+    async def note(self, ctx, *, msg=''):
+        """Take a note about the current thread, useful for noting context."""
+        ctx.message.content = msg 
+        thread = await self.bot.threads.find(channel=ctx.channel)
+        if thread:
+            await thread.note(ctx.message)
 
     @commands.command()
     async def edit(self, ctx, message_id: Optional[int]=None, *, new_message):
