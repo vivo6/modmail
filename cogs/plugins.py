@@ -79,6 +79,7 @@ class Plugins:
         dirname = f'plugins/{username}-{repo}/{plugin_name}'
         if 'requirements.txt' in os.listdir(dirname):
             # Install PIP requirements
+            print(dirname + '/' + 'requirements.txt')
             try:
                 await self.bot.loop.run_in_executor(
                     None, self._asubprocess_run,
